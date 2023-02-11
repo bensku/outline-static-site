@@ -1,0 +1,40 @@
+plugins {
+    id 'application'
+    id 'org.openapi.generator' version '6.3.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.javalin:javalin:5.3.2'
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
+    implementation 'org.springframework.security:spring-security-crypto:6.0.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'org.commonmark:commonmark:0.20.0'
+    implementation 'org.commonmark:commonmark-ext-gfm-tables:0.20.0'
+    implementation project(':outline-api')
+}
+
+application {
+    mainClass = 'fi.benjami.site.outline.AppMain'
+}
+
+jar {
+    manifest.attributes['Main-Class'] = 'fi.benjami.site.outline.AppMain'
+}
+
+openApiGenerate {
+    generatorName = 'java'
+    inputSpec = 'vendor/outline-api/spec3.json'
+    outputDir = "${rootDir}/outline-api"
+    apiPackage = 'com.getoutline.api'
+    invokerPackage = 'com.getoutline.invoker'
+   	modelPackage = 'com.getoutline.model'
+   	additionalProperties = [
+   	    useRuntimeException: true,
+   	    library: 'native'
+   	]
+}
