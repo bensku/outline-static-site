@@ -19,7 +19,6 @@ import org.commonmark.node.FencedCodeBlock;
 import org.commonmark.node.Heading;
 import org.commonmark.node.Image;
 import org.commonmark.node.Node;
-import org.commonmark.node.Paragraph;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -133,6 +132,7 @@ public class OutlineLoader {
 			var html = template.replace("{content}", RENDERER.render(doc));
 			html = html.replace("{title}", extractTitle(content));
 			html = html.replace("<p>\\</p>", ""); // FIXME what is this???
+			html = html.replace("\\n", "<br>");
 			yield html.getBytes(StandardCharsets.UTF_8);
 		}
 		default -> extractMedia(content);
@@ -167,7 +167,7 @@ public class OutlineLoader {
 				}
 			}
 		});
-		return title.getPlain();
+		return title.getPlain() == null ? "" : title.getPlain();
 	}
 	
 	private static final String MEDIA_PREFIX = "/api/attachments.redirect?id=";
