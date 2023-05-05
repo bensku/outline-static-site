@@ -16,6 +16,7 @@ public record Page(
 		JAVASCRIPT(".js", "text/javascript"),
 		JPEG(".jpg", "image/jpeg"),
 		PNG(".png", "image/png"),
+		TEXT(".txt", "text/plain"),
 		MARKDOWN("", "text/html"); // Markdown converted to HTML is the default
 		
 		public static Format fromTitle(String title) {

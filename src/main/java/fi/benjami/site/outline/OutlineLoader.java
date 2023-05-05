@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -125,6 +126,7 @@ public class OutlineLoader {
 				.getBytes(StandardCharsets.UTF_8);
 		case CSS -> extractCode(content, "css").getBytes(StandardCharsets.UTF_8);
 		case JAVASCRIPT -> extractCode(content, "javascript").getBytes(StandardCharsets.UTF_8);
+		case TEXT -> extractCode(content, "").getBytes(StandardCharsets.UTF_8);
 		case MARKDOWN -> {
 			var doc = PARSER.parse(content);
 			pages.addAll(patchImages(doc));
@@ -133,6 +135,7 @@ public class OutlineLoader {
 			html = html.replace("{title}", extractTitle(content));
 			html = html.replace("<p>\\</p>", ""); // FIXME what is this???
 			html = html.replace("\\n", "<br>");
+			html = html.replaceAll("\\{title.*\\}", "");
 			yield html.getBytes(StandardCharsets.UTF_8);
 		}
 		default -> extractMedia(content);
@@ -146,7 +149,7 @@ public class OutlineLoader {
 		var code = new AtomicReference<String>();
 		doc.accept(new AbstractVisitor() {
 			public void visit(FencedCodeBlock block) {
-				if (type.equals(block.getInfo())) {					
+				if (Objects.equals(type, block.getInfo())) {
 					code.setPlain(block.getLiteral());
 				}
 			}
@@ -161,9 +164,17 @@ public class OutlineLoader {
 			public void visit(Heading block) {
 				if (block.getLevel() == 1) {
 					var child = block.getFirstChild();
-					if (child instanceof Text text) {						
+					if (child instanceof Text text) {
 						title.setPlain(text.getLiteral());
 					}
+				}
+			}
+			public void visit(Text text) {
+				var str = text.getLiteral();
+				var titleStart = str.indexOf("{title");
+				var titleEnd = str.indexOf("}", titleStart);
+				if (titleStart != -1 && titleEnd != -1) {
+					title.setPlain(str.substring(titleStart + 6, titleEnd).strip());
 				}
 			}
 		});
