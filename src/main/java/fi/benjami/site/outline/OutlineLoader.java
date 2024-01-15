@@ -19,6 +19,7 @@ import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.FencedCodeBlock;
 import org.commonmark.node.Heading;
 import org.commonmark.node.Image;
+import org.commonmark.node.Link;
 import org.commonmark.node.Node;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
@@ -208,6 +209,14 @@ public class OutlineLoader {
 		var attachment = new AtomicReference<byte[]>();
 		doc.accept(new AbstractVisitor() {
 			public void visit(Image block) {
+				if (block.getDestination().startsWith(MEDIA_PREFIX)) {
+					// Create a page for the attachment
+					var attachmentId = block.getDestination().substring(MEDIA_PREFIX.length());
+					var page = loadAttachment(api, UUID.fromString(attachmentId));
+					attachment.setPlain(page.content());
+				}
+			}
+			public void visit(Link block) {
 				if (block.getDestination().startsWith(MEDIA_PREFIX)) {
 					// Create a page for the attachment
 					var attachmentId = block.getDestination().substring(MEDIA_PREFIX.length());

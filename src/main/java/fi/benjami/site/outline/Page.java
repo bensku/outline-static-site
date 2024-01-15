@@ -16,7 +16,9 @@ public record Page(
 		JAVASCRIPT(".js", "text/javascript"),
 		JPEG(".jpg", "image/jpeg"),
 		PNG(".png", "image/png"),
+		WEBP(".webp", "image/webp"),
 		TEXT(".txt", "text/plain"),
+		WOFF2(".woff2", "font/woff2"),
 		MARKDOWN("", "text/html"); // Markdown converted to HTML is the default
 		
 		public static Format fromTitle(String title) {
@@ -34,7 +36,7 @@ public record Page(
 					return format;
 				}
 			}
-			throw new AssertionError();
+			throw new AssertionError(type);
 		}
 		
 		private String extension;

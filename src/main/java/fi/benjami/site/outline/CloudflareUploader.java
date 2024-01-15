@@ -72,10 +72,10 @@ public class CloudflareUploader {
 			if (uploadSize > 10_000_000) {
 				hashes.putAll(uploadFiles0(uploadToken, nextBatch));
 				nextBatch.clear();
-			} else {
-				uploadSize += page.content().length;
-				nextBatch.add(page);
+				uploadSize = 0;
 			}
+			uploadSize += page.content().length;
+			nextBatch.add(page);
 		}
 		hashes.putAll(uploadFiles0(uploadToken, nextBatch));
 		return hashes;
@@ -112,7 +112,7 @@ public class CloudflareUploader {
 				.header("Authorization", "Bearer " + uploadToken)
 				.build();
 		var response = client.send(req, BodyHandlers.ofString());
-		LOG.info("Uploaded to CF pages: {}", response);
+		LOG.info("Uploaded to {} pages CF: {}", pages.size(), response);
 		if (response.statusCode() != 200) {
 			LOG.error(response.body());
 			throw new InternalServerErrorResponse();
