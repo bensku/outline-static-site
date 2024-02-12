@@ -37,9 +37,15 @@ public class CloudflareUploader {
 	
 	public CloudflareUploader(SiteConfig config) {
 		this.client = HttpClient.newHttpClient();
-		this.account = config.cfAccount();
+		// Path should have format like /ACCOUNT/pages/view/SITE
+		var parts = URI.create(config.pageSettingsUrl()).getPath().split("/");
+		this.account = parts[1];
 		this.apiToken = config.cfApiToken();
-		this.site = config.cfPagesSite();
+		this.site = parts[4];
+	}
+	
+	public String siteUrl() {
+		return "https://" + site + ".pages.dev";
 	}
 	
 	public void deploy(List<Page> pages) {

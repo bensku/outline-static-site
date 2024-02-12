@@ -1,6 +1,7 @@
 package fi.benjami.site.outline;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,12 +37,12 @@ public class AppMain {
 		});
 		app.get("/publish/{data}", ctx -> {
 			var config = MAPPER.readValue(CRYPTO.decrypt(ctx.pathParam("data")), SiteConfig.class);
-			var loader = new OutlineLoader(config.outlineUrl(), config.outlineApiToken(), config.collectionId());
+			var loader = new OutlineLoader(URI.create(config.collectionUrl()), config.outlineApiToken());
 			var pages = loader.loadAll();
 			var uploader = new CloudflareUploader(config);
 			uploader.deploy(pages);
 			
-			ctx.redirect("https://" + config.cfPagesSite() + ".pages.dev");
+			ctx.redirect(uploader.siteUrl());
 		});
 		
 		app.start(Integer.parseInt(System.getenv("PORT")));

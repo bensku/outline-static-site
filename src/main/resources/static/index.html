@@ -12,28 +12,20 @@
 
 <form id="form">
 	<div>
-        <label for="outlineUrl">Outline address</label>
-        <input type="url" name="outlineUrl" id="outlineUrl" />
+        <label for="collectionUrl">Outline collection address</label>
+        <input type="url" name="collectionUrl" id="collectionUrl" />
     </div>
     <div>
         <label for="outlineToken">Outline API token</label>
         <input type="text" name="outlineToken" id="outlineToken" />
     </div>
     <div>
-        <label for="outlineCollection">Outline collection id</label>
-        <input type="text" name="outlineCollection" id="outlineCollection" />
-    </div>
-    <div>
-        <label for="cfAccount">Cloudflare account id</label>
-        <input type="text" name="cfAccount" id="cfAccount" />
+        <label for="pageSettingsUrl">Page settings address</label>
+        <input type="text" name="pageSettingsUrl" id="pageSettingsUrl" />
     </div>
     <div>
         <label for="cfApiToken">Cloudflare API token</label>
         <input type="text" name="cfApiToken" id="cfApiToken" />
-    </div>
-    <div>
-        <label for="cfPagesSite">Cloudflare pages project</label>
-        <input type="text" name="cfPagesSite" id="cfPagesSite" />
     </div>
     <button type="submit">Create update links</button>
 </form>
@@ -44,22 +36,18 @@
 const form = document.getElementById('form');
 const links = document.getElementById('links');
 
-const outlineUrl = document.getElementById('outlineUrl');
+const collectionUrl = document.getElementById('collectionUrl');
 const outlineApiToken = document.getElementById('outlineToken');
-const outlineCollection = document.getElementById('outlineCollection');
-const cfAccount = document.getElementById('cfAccount');
+const pageSettingsUrl = document.getElementById('pageSettingsUrl');
 const cfApiToken = document.getElementById('cfApiToken');
-const cfPagesSite = document.getElementById('cfPagesSite');
 
 form.addEventListener('submit', async event => {
 	event.preventDefault();
     const payload = {
-        outlineUrl: outlineUrl.value,
+        collectionUrl: collectionUrl.value,
         outlineApiToken: outlineApiToken.value,
-        collectionId: outlineCollection.value,
-        cfAccount: cfAccount.value,
+        pageSettingsUrl: pageSettingsUrl.value,
         cfApiToken: cfApiToken.value,
-        cfPagesSite: cfPagesSite.value
     };
     console.log('Requesting encrypted payload for', payload);
     const result = await fetch('/encrypt', {

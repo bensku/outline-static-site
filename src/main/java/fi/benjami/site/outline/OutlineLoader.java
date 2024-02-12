@@ -1,6 +1,7 @@
 package fi.benjami.site.outline;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -28,12 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.getoutline.api.AttachmentsApi;
+import com.getoutline.api.CollectionsApi;
 import com.getoutline.api.DocumentsApi;
 import com.getoutline.invoker.ApiClient;
 import com.getoutline.invoker.ApiException;
 import com.getoutline.model.AttachmentsRedirectPostRequest;
 import com.getoutline.model.Document;
 import com.getoutline.model.DocumentsListPostRequest;
+import com.getoutline.model.Pagination;
 
 public class OutlineLoader {
 	
@@ -49,23 +52,23 @@ public class OutlineLoader {
 
 	private final HttpClient httpClient;
 	private final ApiClient client;
-	private final UUID collectionId;
+	private final String collectionPath;
 	
-	public OutlineLoader(String apiUrl, String apiToken, String collection) {
+	public OutlineLoader(URI collectionUrl, String apiToken) {
 		this.httpClient = HttpClient.newHttpClient();
 		this.client = new ApiClient();
-		client.updateBaseUri(apiUrl + "/api");
+		client.updateBaseUri(collectionUrl.getScheme() + "://" + collectionUrl.getHost() + "/api");
 		client.setRequestInterceptor(builder -> {
 			builder.header("User-Agent", AppMain.USER_AGENT);
 			builder.header("Authorization", "Bearer " + apiToken);
 		});
-		this.collectionId = UUID.fromString(collection);
+		this.collectionPath = collectionUrl.getPath();
 	}
 	
 	public List<Page> loadAll() {
 		var api = new DocumentsApi(client);
 		var documents = api.documentsListPost(new DocumentsListPostRequest()
-				.collectionId(collectionId)).getData();
+				.collectionId(getCollectionId(collectionPath))).getData();
 		LOG.info("Loaded documents from Outline");
 		
 		var docs = new HashMap<UUID, Document>();
@@ -112,6 +115,18 @@ public class OutlineLoader {
 					return pages.stream();
 				})
 				.toList();
+	}
+	
+	private UUID getCollectionId(String path) {
+		var api = new CollectionsApi(client);
+		// TODO pagination
+		var collections = api.collectionsListPost(new Pagination().offset(BigDecimal.ZERO));
+		for (var collection : collections.getData()) {
+			if (path.equals(collection.getUrl())) {
+				return collection.getId();
+			}
+		}
+		throw new IllegalArgumentException("collection not found: " + path);
 	}
 	
 	private String formatName(String title) {

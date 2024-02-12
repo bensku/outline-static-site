@@ -2,9 +2,9 @@ package fi.benjami.site.outline;
 
 public record SiteConfig(
 		/**
-		 * Outline base URL, not including /api.
+		 * URL of the Outline collection, i.e. http://HOST/collection/NAME.
 		 */
-		String outlineUrl,
+		String collectionUrl,
 		
 		/**
 		 * Outline API token.
@@ -12,22 +12,12 @@ public record SiteConfig(
 		String outlineApiToken,
 		
 		/**
-		 * Id of the workspace to create site from.
+		 * URL of Cloudflare Pages console settings page for the site.
 		 */
-		String collectionId,
-		
-		/**
-		 * Cloudflare account id.
-		 */
-		String cfAccount,
+		String pageSettingsUrl,
 		
 		/**
 		 * Cloudflare API token.
 		 */
-		String cfApiToken,
-		
-		/**
-		 * Site name.
-		 */
-		String cfPagesSite
+		String cfApiToken
 ) {}
